@@ -3,7 +3,10 @@ function [ gamma ] = variogv( z, x, L, nugget, range )
 %   z - spatial parameter (e.g. depth, m)
 %   x - variable (e.g. porosity)
 %   L - max number of lags (lag - distance between neighbor points)
-%   nugget, range - model variogram parameters
+%   model variogram parameters:
+%   nugget - in percents(%) from sill
+%   range - in meters (m)
+%   OUTPUT
 %   gamma  - variogram values
 
 
@@ -36,14 +39,18 @@ gamma(i) = 0.5*(sum(pairs(:,i)/count_pairs(i)));
 end
 
 scatter(lag_distance,gamma); % plot experimental variogram
+grid on;
+xlabel('distance, m');
+ylabel('gamma');
 hold on
 
 % variogram model
-sill=var(x(1:L));
+sill = var(x(1:L));
+nugget = (nugget/100)*sill;
 sph_var=zeros(1,L); % spherical variogram
 for i=1:L
     if lag_distance(1,i) <= range
-        sph_var(1,i)=nugget+sill*(1.5*(lag_distance(1,i)/range)-0.5*(lag_distance(1,i)/range)^3);
+        sph_var(1,i)= nugget+sill*(1.5*(lag_distance(1,i)/range)-0.5*(lag_distance(1,i)/range)^3);
     else
         sph_var(1,i)= nugget+sill;
     end
